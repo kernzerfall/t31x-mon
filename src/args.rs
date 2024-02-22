@@ -5,8 +5,8 @@ use log::LevelFilter;
 pub(crate) struct CliArgs {
     /// Tapo Username (E-Mail)
     #[arg(short = 'u', long = "user")]
-    pub user: String, 
-    
+    pub user: String,
+
     /// Hub IP address
     #[arg(short = 'i', long = "hub-ip")]
     pub ip: String,
