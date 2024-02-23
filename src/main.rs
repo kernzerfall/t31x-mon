@@ -97,14 +97,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = CliArgs::parse();
 
     pretty_env_logger::formatted_timed_builder()
-        .filter_level(args.log_level)
+        .filter(Some("home_temperature_statusbar"), args.log_level)
         .init();
 
     info!("hello");
-
-    // let hub = ApiClient::new("***REMOVED***", "***REMOVED***")?
-    //     .h100(args.ip.to_owned())
-    //     .await?;
 
     let pass = get_pass(args.user.as_str())?;
     let hub = setup(args.user.as_str(), pass.as_str(), args.ip.as_str()).await?;
@@ -117,9 +113,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
 
     loop {
-        info!("fetching");
+        info!("Fetching");
         get_print_temp_data(&hub).await?;
-        info!("sleeping");
+        info!("Sleeping for {}s", args.interval);
         sleep(Duration::from_secs(args.interval)).await;
     }
 }
