@@ -55,7 +55,10 @@ fn get_pass(user: &str) -> Result<String, anyhow::Error> {
             Err(anyhow!("K::AMBIG"))
         }
         Ok(res) => Ok(res),
-        _ => Err(anyhow!("K::UNKN")),
+        Err(e) => {
+            error!("Unknown keyring error: {e}");
+            Err(anyhow!("K::UNKN"))
+        },
     }
 }
 
