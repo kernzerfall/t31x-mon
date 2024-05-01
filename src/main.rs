@@ -94,6 +94,7 @@ async fn get_print_temp_data(
             "\u{f07d0} {:02.1}\u{f0504} {:02}\u{e373}",
             tdata.current_temperature, tdata.current_humidity
         );
+        return Ok(());
     }
 
     info!("Multiple temperature devices; filtering data by {device_id:?}");
