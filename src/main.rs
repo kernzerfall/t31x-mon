@@ -58,7 +58,7 @@ fn get_pass(user: &str) -> Result<String, anyhow::Error> {
         Err(e) => {
             error!("Unknown keyring error: {e}");
             Err(anyhow!("K::UNKN"))
-        },
+        }
     }
 }
 
@@ -66,7 +66,10 @@ async fn setup(user: &str, pass: &str, ip: &str) -> Result<HubHandler, tapo::Err
     ApiClient::new(user, pass)?.h100(ip).await
 }
 
-async fn get_print_temp_data(hub: &HubHandler) -> Result<(), anyhow::Error> {
+async fn get_print_temp_data(
+    hub: &HubHandler,
+    device_id: &Option<String>,
+) -> Result<(), anyhow::Error> {
     let children = hub.get_child_device_list().await?;
     debug!("Children data\n{children:#?}");
 
@@ -92,6 +95,25 @@ async fn get_print_temp_data(hub: &HubHandler) -> Result<(), anyhow::Error> {
             tdata.current_temperature, tdata.current_humidity
         );
     }
+
+    info!("Multiple temperature devices; filtering data by {device_id:?}");
+    if let Some(device_id) = device_id {
+        match temperature_data
+            .iter()
+            .find(|td| td.device_id == *device_id)
+        {
+            Some(td) => {
+                println!(
+                    "\u{f07d0} {:02.1}\u{f0504} {:02}\u{e373}",
+                    td.current_temperature, td.current_humidity
+                );
+            }
+            None => {
+                error!("Could not find temperature data for given device id.");
+            }
+        };
+    }
+    // println!("{:#?}", temperature_data);
     Ok(())
 }
 
@@ -117,7 +139,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     loop {
         info!("Fetching");
-        get_print_temp_data(&hub).await?;
+        get_print_temp_data(&hub, &args.device).await?;
         info!("Sleeping for {}s", args.interval);
         sleep(Duration::from_secs(args.interval)).await;
     }
