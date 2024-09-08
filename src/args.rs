@@ -19,6 +19,10 @@ pub(crate) struct CliArgs {
     #[arg(short = 'n', long = "update-interval", default_value_t = 120)]
     pub interval: u64,
 
+    /// Only run once and exit
+    #[arg(short = 'o', long = "run-once", default_value_t = false)]
+    pub once: bool,
+
     /// Log level
     #[arg(short = 'l', long = "log-level", default_value_t = LevelFilter::Info)]
     pub log_level: LevelFilter,

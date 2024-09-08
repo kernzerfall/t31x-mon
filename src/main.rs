@@ -66,7 +66,7 @@ async fn setup(user: &str, pass: &str, ip: &str) -> Result<HubHandler, tapo::Err
     ApiClient::new(user, pass)?.h100(ip).await
 }
 
-async fn get_print_temp_data(
+async fn print_temp_data(
     hub: &HubHandler,
     device_id: &Option<String>,
 ) -> Result<(), anyhow::Error> {
@@ -129,7 +129,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     info!("hello");
 
     let pass = get_pass(args.user.as_str())?;
-    let hub = setup(args.user.as_str(), pass.as_str(), args.ip.as_str()).await?;
+    let mut hub = setup(args.user.as_str(), pass.as_str(), args.ip.as_str()).await?;
 
     let device_info = hub.get_device_info().await?;
     debug!("Device Info\n{device_info:#?}");
@@ -138,9 +138,36 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         device_info.r#type, device_info.nickname
     );
 
+    let mut fresh_auth = true;
     loop {
         info!("Fetching");
-        get_print_temp_data(&hub, &args.device).await?;
+        let tdata = print_temp_data(&hub, &args.device).await;
+
+        // if tdata failed try to reauth once.
+        if tdata.is_err() {
+            // if coming straight from a reauth, abort.
+            if fresh_auth {
+                error!("get_print_temp_data failed with fresh auth. Exiting.");
+                return Err(anyhow!("reauth-failed").into());
+            }
+
+            info!("get_print_temp_data failed: trying to reauth.");
+
+            // replace auth
+            hub = setup(args.user.as_str(), pass.as_str(), args.ip.as_str()).await?;
+            fresh_auth = true;
+            continue;
+        }
+
+        // once we've gotten a good tdata, the auth is 'old' and we may replace it.
+        fresh_auth = false;
+
+        if args.once {
+            info!("--run-once/-o specified. Exiting.");
+            return Ok(());
+        }
+
+        // sleep cycle
         info!("Sleeping for {}s", args.interval);
         sleep(Duration::from_secs(args.interval)).await;
     }
