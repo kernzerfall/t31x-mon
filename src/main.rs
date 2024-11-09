@@ -11,7 +11,7 @@ use std::time::Duration;
 
 use anyhow::anyhow;
 use clap::*;
-use tapo::responses::ChildDeviceResult::*;
+use tapo::responses::ChildDeviceHubResult::*;
 use tapo::responses::T31XResult;
 use tapo::ApiClient;
 
@@ -63,7 +63,7 @@ fn get_pass(user: &str) -> Result<String, anyhow::Error> {
 }
 
 async fn setup(user: &str, pass: &str, ip: &str) -> Result<HubHandler, tapo::Error> {
-    ApiClient::new(user, pass)?.h100(ip).await
+    ApiClient::new(user, pass).h100(ip).await
 }
 
 async fn print_temp_data(
