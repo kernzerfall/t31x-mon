@@ -1,5 +1,5 @@
 [package]
-name = "home-temperature-statusbar"
+name = "t31x-mon"
 version = "0.2.0"
 edition = "2021"
 

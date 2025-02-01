@@ -1,6 +1,6 @@
 mod args;
 
-const KEYRING_SERVICE_NAME: &str = "home-temperature-statusbar";
+const KEYRING_SERVICE_NAME: &str = "t31x-mon";
 
 extern crate pretty_env_logger;
 
@@ -123,7 +123,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = CliArgs::parse();
 
     pretty_env_logger::formatted_timed_builder()
-        .filter(Some("home_temperature_statusbar"), args.log_level)
+        .filter(Some("t31x-mon"), args.log_level)
         .init();
 
     info!("hello");
