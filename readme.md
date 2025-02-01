@@ -8,4 +8,7 @@ save/retrieve your Tapo password to/from your keyring.
 
 For usage, look at `t31x-mon --help`.
 
+You can run the utility with `-l DEBUG` to get a list of available
+`device_id`s.
+
 The symbols referenced in unicode rely on NerdFonts.
