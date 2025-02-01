@@ -123,7 +123,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = CliArgs::parse();
 
     pretty_env_logger::formatted_timed_builder()
-        .filter(Some("t31x-mon"), args.log_level)
+        .filter(Some("t31x_mon"), args.log_level)
         .init();
 
     info!("hello");
